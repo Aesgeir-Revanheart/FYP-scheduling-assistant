@@ -74,7 +74,10 @@ def get_gmail_service():
 
 def read_latest_emails(service, max_results=5):
     results = service.users().messages().list(
-        userId="me", maxResults=max_results
+        userId="me",
+        maxResults=max_results,
+        labelIds=["INBOX"],
+        q="category:primary"
     ).execute()
 
     messages = results.get("messages", [])
