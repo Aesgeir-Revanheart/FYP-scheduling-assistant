@@ -5,7 +5,7 @@ def parse_query(text: str):
 
     out = {}
 
-    # date intent (for now, only "tomorrow")
+    # date intent (for now only "tomorrow")
     if "tomorrow" in text_l:
         out["date"] = "tomorrow"
 

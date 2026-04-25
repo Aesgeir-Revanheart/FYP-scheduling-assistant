@@ -18,6 +18,9 @@ def path_next_to_script(filename: str) -> str:
     return os.path.join(project_root, filename)
 
 
+
+# CALENDAR AUTH 
+
 def get_creds():
     oauth_json_path = path_next_to_script(OAUTH_JSON_FILENAME)
     token_path = path_next_to_script(TOKEN_FILENAME)
@@ -43,6 +46,62 @@ def get_creds():
 
     return creds
 
+
+
+# GMAIL AUTH 
+
+def get_gmail_service():
+    oauth_path = path_next_to_script(GMAIL_OAUTH_FILENAME)
+    token_path = path_next_to_script(GMAIL_TOKEN_FILENAME)
+
+    creds = None
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, GMAIL_SCOPES)
+
+    if not creds or not creds.valid:
+        flow = InstalledAppFlow.from_client_secrets_file(oauth_path, GMAIL_SCOPES)
+        creds = flow.run_local_server(port=0)
+
+        with open(token_path, "w", encoding="utf-8") as f:
+            f.write(creds.to_json())
+
+    service = build("gmail", "v1", credentials=creds)
+    return service
+
+
+
+# GMAIL READER 
+
+def read_latest_emails(service, max_results=5):
+    results = service.users().messages().list(
+        userId="me", maxResults=max_results
+    ).execute()
+
+    messages = results.get("messages", [])
+
+    if not messages:
+        print("No messages found.")
+        return
+
+    print("\n=== LATEST EMAILS ===\n")
+
+    for msg in messages:
+        msg_data = service.users().messages().get(
+            userId="me", id=msg["id"]
+        ).execute()
+
+        headers = msg_data.get("payload", {}).get("headers", [])
+
+        subject = next((h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)")
+        sender = next((h["value"] for h in headers if h["name"] == "From"), "(Unknown)")
+
+        print(f"From: {sender}")
+        print(f"Subject: {subject}")
+        print("-" * 40)
+
+
+
+# CALENDAR FUNCTIONS 
 
 def list_calendars(service):
     cal_list = service.calendarList().list().execute()
@@ -129,12 +188,12 @@ def freebusy_probe(service, calendar_id: str):
 
 
 
-
-
+# MAIN
 
 def main():
     print("RUNNING:", os.path.abspath(__file__))
 
+    # --- Calendar ---
     creds = get_creds()
     service = build("calendar", "v3", credentials=creds)
 
@@ -154,7 +213,6 @@ def main():
     print(f"[DEBUG] Using calendarId       = {target_id!r}")
     print(f"[DEBUG] accessRole            = {target_cal.get('accessRole')!r}\n")
 
-    # 1) Events (first 50 of up to 250)
     events = fetch_events(service, target_id)
 
     USER_QUERY = "When am I free tomorrow after 3pm before 6pm?"
@@ -194,13 +252,12 @@ def main():
     else:
         print("Query not understood yet.")
 
-
-
-
-    # 2) FreeBusy (first 50 of busy blocks)
     freebusy_probe(service, target_id)
+
+    # --- Gmail ---
+    gmail_service = get_gmail_service()
+    read_latest_emails(gmail_service)
 
 
 if __name__ == "__main__":
     main()
-

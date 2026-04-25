@@ -79,7 +79,7 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
         print(f"FREE  {day_start.strftime('%H:%M')} → {day_end.strftime('%H:%M')}")
         return
 
-    # Sort & merge busy blocks (ignore titles for merging)
+    # Sort & merge busy blocks 
     busy.sort(key=lambda x: x[0])
 
     merged = []
