@@ -5,7 +5,7 @@ from datetime import timezone, timedelta
 SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 
 # Put your exact OAuth JSON filename here (keep your file name as-is)
-OAUTH_JSON_FILENAME = "client_secret_155485592908-k5pvceus0koj1il48ap3b094phj3k20k.apps.googleusercontent.com.json"
+OAUTH_JSON_FILENAME = "client_secret.json"
 
 TOKEN_FILENAME = "token.json"
 TARGET_CALENDAR_NAME = os.getenv("TARGET_CALENDAR_NAME", "SmartB Team")
