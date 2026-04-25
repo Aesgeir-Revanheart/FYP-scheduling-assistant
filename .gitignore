@@ -1,4 +1,5 @@
 token.json
+token_gmail.json
 client_secret*.json
 __pycache__/
 venv/
