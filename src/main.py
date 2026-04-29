@@ -99,10 +99,13 @@ def read_latest_emails(service, events, max_results=5):
         subject = next((h["value"] for h in headers if h["name"] == "Subject"), "(No Subject)")
         sender = next((h["value"] for h in headers if h["name"] == "From"), "(Unknown)")
 
+        body = msg_data.get("snippet", "")
+
         print(f"From: {sender}")
         print(f"Subject: {subject}")
 
-        process_email(subject, events)
+        full_text = subject + " " + body
+        process_email(full_text, events)
 
         print("-" * 40)
 
