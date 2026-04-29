@@ -8,6 +8,7 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from email_processor import process_email
 
 import re
 
@@ -72,7 +73,7 @@ def get_gmail_service():
 
 # GMAIL READER 
 
-def read_latest_emails(service, max_results=5):
+def read_latest_emails(service, events, max_results=5):
     results = service.users().messages().list(
         userId="me",
         maxResults=max_results,
@@ -100,6 +101,9 @@ def read_latest_emails(service, max_results=5):
 
         print(f"From: {sender}")
         print(f"Subject: {subject}")
+
+        process_email(subject, events)
+
         print("-" * 40)
 
 
@@ -291,7 +295,7 @@ def main():
 
     # --- Gmail ---
     gmail_service = get_gmail_service()
-    read_latest_emails(gmail_service)
+    read_latest_emails(gmail_service, events)
 
 
 if __name__ == "__main__":
