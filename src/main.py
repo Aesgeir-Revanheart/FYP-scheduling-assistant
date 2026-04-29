@@ -218,7 +218,7 @@ def main():
 
     events = fetch_events(service, target_id)
 
-    USER_QUERY = "When am I free tomorrow after 3pm before 6pm?"
+    USER_QUERY = "Are you free tomorrow at 6pm?"
 
     parsed = parse_query(USER_QUERY)
     print(f"[DEBUG] USER_QUERY = {USER_QUERY!r}")
@@ -251,6 +251,38 @@ def main():
             earliest_start=earliest_start,
             latest_end=latest_end,
         )
+
+        # SPECIFIC TIME CHECK 
+        at_hour = parsed.get("at_hour")
+        at_min = parsed.get("at_min", 0)
+
+        if at_hour is not None:
+            specific_time = datetime.combine(
+                tomorrow, datetime.min.time(), tzinfo=MY_TZ
+            ).replace(hour=at_hour, minute=at_min)
+
+            print("\n=== SPECIFIC TIME CHECK ===\n")
+
+            is_free = True
+
+            for e in events:
+                start_dt_str = e["start"].get("dateTime")
+                end_dt_str = e["end"].get("dateTime")
+
+                if not start_dt_str or not end_dt_str:
+                    continue
+
+                start_dt = datetime.fromisoformat(start_dt_str.replace("Z", "+00:00")).astimezone(MY_TZ)
+                end_dt = datetime.fromisoformat(end_dt_str.replace("Z", "+00:00")).astimezone(MY_TZ)
+
+                if start_dt <= specific_time < end_dt:
+                    is_free = False
+                    break
+
+            if is_free:
+                print(f"You are FREE at {specific_time.strftime('%H:%M')}")
+            else:
+                print(f"You are BUSY at {specific_time.strftime('%H:%M')}")
 
     else:
         print("Query not understood yet.")
