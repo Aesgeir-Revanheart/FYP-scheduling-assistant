@@ -41,14 +41,7 @@ def process_email(subject, events):
             target_date, datetime.min.time(), tzinfo=MY_TZ
         ).replace(hour=before_hour, minute=before_min)
 
-    # --- SHOW SLOTS ---
-    show_free_slots_tomorrow(
-        events,
-        earliest_start=earliest_start,
-        latest_end=latest_end,
-    )
-
-    # --- SPECIFIC TIME CHECK (PRIORITY FEATURE) ---
+    # --- SPECIFIC TIME CHECK (IF "at" is present) ---
     at_hour = parsed.get("at_hour")
     at_min = parsed.get("at_min", 0)
 
@@ -79,3 +72,11 @@ def process_email(subject, events):
             print(f"Result: FREE at {specific_time.strftime('%H:%M')}")
         else:
             print(f"Result: BUSY at {specific_time.strftime('%H:%M')}")
+
+    # --- OTHERWISE: SHOW SLOTS (for before/after queries) ---
+    else:
+        show_free_slots_tomorrow(
+            events,
+            earliest_start=earliest_start,
+            latest_end=latest_end,
+        )
