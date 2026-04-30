@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from config import *
 
-
+#checks whether an all-day event is actually a type of "on leave" event
 def is_leave_all_day(title: str) -> bool:
     t = (title or "").upper()
     return any(k in t for k in LEAVE_KEYWORDS)
@@ -10,7 +10,7 @@ def is_leave_all_day(title: str) -> bool:
 def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, target_date=None):
     now_local = datetime.now(MY_TZ)
 
-    # --- DATE HANDLING ---
+    #Determines which day is being evaluated
     if target_date is None:
         day = (now_local + timedelta(days=1)).date()  # fallback = tomorrow
         label = "Tomorrow"
@@ -20,6 +20,7 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, targe
 
     print(f"\n=== FREE SLOTS ({label}, MY time) ===\n")
 
+    #Define working window
     day_start = datetime.combine(day, datetime.min.time(), tzinfo=MY_TZ).replace(
         hour=WORK_START_HOUR, minute=WORK_START_MIN
     )
@@ -27,7 +28,7 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, targe
         hour=WORK_END_HOUR, minute=WORK_END_MIN
     )
 
-    # Apply filters
+    # invalid range check
     if earliest_start is not None:
         day_start = max(day_start, earliest_start)
 
@@ -40,6 +41,8 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, targe
 
     busy = []
 
+
+    #Build list of busy intervals
     for e in events:
         title = e.get("summary", "")
 
@@ -63,6 +66,7 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, targe
 
             t = (title or "").upper()
 
+            # Ignore public holidays and annual  leave entries
             if "HOLIDAY" in t or "PUBLIC" in t:
                 continue
 
@@ -77,11 +81,14 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, targe
 
             busy.append((day_start, day_end, title + " [ALL-DAY]"))
 
+
+    # if nothing is clashing with other events of the day
     if not busy:
         print("No events.")
         print(f"FREE  {day_start.strftime('%H:%M')} → {day_end.strftime('%H:%M')}")
         return
 
+    # merge overlapping busy intervals
     busy.sort(key=lambda x: x[0])
 
     merged = []

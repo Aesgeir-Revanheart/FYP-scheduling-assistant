@@ -20,7 +20,7 @@ def path_next_to_script(filename: str) -> str:
 
 
 
-# CALENDAR AUTH 
+# Handles calendar authentication and token refresh
 
 def get_creds():
     oauth_json_path = path_next_to_script(OAUTH_JSON_FILENAME)
@@ -49,7 +49,7 @@ def get_creds():
 
 
 
-# GMAIL AUTH 
+#Handles Gmail authentication
 
 def get_gmail_service():
     oauth_path = path_next_to_script(GMAIL_OAUTH_FILENAME)
@@ -71,7 +71,7 @@ def get_gmail_service():
 
 
 
-# GMAIL READER 
+#Reads latest emails and passes them to the processor
 
 def read_latest_emails(service, events, max_results=15):
     results = service.users().messages().list(
@@ -136,7 +136,7 @@ def find_calendar_by_name(calendars, name: str):
             return cal
     return None
 
-
+# fetches events from the selected calendar within a time window
 def fetch_events(service, calendar_id: str):
     time_min = datetime.now(timezone.utc).isoformat()
     time_max = (datetime.now(timezone.utc) + timedelta(days=EVENTS_DAYS_FORWARD)).isoformat()
@@ -203,12 +203,14 @@ def freebusy_probe(service, calendar_id: str):
 def main():
     print("RUNNING:", os.path.abspath(__file__))
 
-    # --- Calendar ---
+    #Initialize calendar service
     creds = get_creds()
     service = build("calendar", "v3", credentials=creds)
 
     calendars = list_calendars(service)
 
+
+    # find the target calendar by name
     target_cal = find_calendar_by_name(calendars, TARGET_CALENDAR_NAME)
     print(f"\n[DEBUG] TARGET_CALENDAR_NAME = {TARGET_CALENDAR_NAME!r}")
 
@@ -225,7 +227,7 @@ def main():
 
     events = fetch_events(service, target_id)
 
-    USER_QUERY = "Are you free before 11pm today?"
+    USER_QUERY = "Are you free at 9pm tomorrow?"
 
     parsed = parse_query(USER_QUERY)
     print(f"[DEBUG] USER_QUERY = {USER_QUERY!r}")
