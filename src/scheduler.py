@@ -53,13 +53,21 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
             busy.append((max(start_dt, day_start), min(end_dt, day_end), title))
 
         else:
-            # All-day event
-            if not is_leave_all_day(title):
-                continue
-
+            # All-day event (end date is exclusive)
             start_dt = datetime.fromisoformat(start_date_str).replace(tzinfo=MY_TZ)
             end_dt = datetime.fromisoformat(end_date_str).replace(tzinfo=MY_TZ)
 
+            t = (title or "").upper()
+
+            # Ignore public holidays and non-client leave
+            if "HOLIDAY" in t or "PUBLIC" in t:
+                continue
+
+            # Ignore generic leave (e.g. staff AL)
+            if "AL" in t or "LEAVE" in t or "OOO" in t:
+                continue
+
+            # If you reach here → treat as actual blocking all-day event
             all_day_start = datetime.combine(tomorrow, datetime.min.time(), tzinfo=MY_TZ)
             all_day_end = all_day_start + timedelta(days=1)
 
