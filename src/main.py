@@ -73,7 +73,7 @@ def get_gmail_service():
 
 # GMAIL READER 
 
-def read_latest_emails(service, events, max_results=5):
+def read_latest_emails(service, events, max_results=15):
     results = service.users().messages().list(
         userId="me",
         maxResults=max_results,
