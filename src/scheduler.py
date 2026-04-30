@@ -7,16 +7,23 @@ def is_leave_all_day(title: str) -> bool:
     return any(k in t for k in LEAVE_KEYWORDS)
 
 
-def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
-    print("\n=== FREE SLOTS (Tomorrow, MY time) ===\n")
-
+def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None, target_date=None):
     now_local = datetime.now(MY_TZ)
-    tomorrow = (now_local + timedelta(days=1)).date()
 
-    day_start = datetime.combine(tomorrow, datetime.min.time(), tzinfo=MY_TZ).replace(
+    # --- DATE HANDLING ---
+    if target_date is None:
+        day = (now_local + timedelta(days=1)).date()  # fallback = tomorrow
+        label = "Tomorrow"
+    else:
+        day = target_date
+        label = "Selected Day"
+
+    print(f"\n=== FREE SLOTS ({label}, MY time) ===\n")
+
+    day_start = datetime.combine(day, datetime.min.time(), tzinfo=MY_TZ).replace(
         hour=WORK_START_HOUR, minute=WORK_START_MIN
     )
-    day_end = datetime.combine(tomorrow, datetime.min.time(), tzinfo=MY_TZ).replace(
+    day_end = datetime.combine(day, datetime.min.time(), tzinfo=MY_TZ).replace(
         hour=WORK_END_HOUR, minute=WORK_END_MIN
     )
 
@@ -27,7 +34,6 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
     if latest_end is not None:
         day_end = min(day_end, latest_end)
 
-    # Invalid window check
     if day_start >= day_end:
         print("Requested time window is invalid (start >= end). No slots.")
         return
@@ -43,7 +49,6 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
         end_date_str = e["end"].get("date")
 
         if start_dt_str and end_dt_str:
-            # Timed event
             start_dt = datetime.fromisoformat(start_dt_str.replace("Z", "+00:00")).astimezone(MY_TZ)
             end_dt = datetime.fromisoformat(end_dt_str.replace("Z", "+00:00")).astimezone(MY_TZ)
 
@@ -53,22 +58,18 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
             busy.append((max(start_dt, day_start), min(end_dt, day_end), title))
 
         else:
-            # All-day event (end date is exclusive)
             start_dt = datetime.fromisoformat(start_date_str).replace(tzinfo=MY_TZ)
             end_dt = datetime.fromisoformat(end_date_str).replace(tzinfo=MY_TZ)
 
             t = (title or "").upper()
 
-            # Ignore public holidays and non-client leave
             if "HOLIDAY" in t or "PUBLIC" in t:
                 continue
 
-            # Ignore generic leave (e.g. staff AL)
             if "AL" in t or "LEAVE" in t or "OOO" in t:
                 continue
 
-            # If you reach here → treat as actual blocking all-day event
-            all_day_start = datetime.combine(tomorrow, datetime.min.time(), tzinfo=MY_TZ)
+            all_day_start = datetime.combine(day, datetime.min.time(), tzinfo=MY_TZ)
             all_day_end = all_day_start + timedelta(days=1)
 
             if end_dt <= all_day_start or start_dt >= all_day_end:
@@ -76,19 +77,11 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
 
             busy.append((day_start, day_end, title + " [ALL-DAY]"))
 
-    # --- NO BUSY EVENTS ---
     if not busy:
-        if earliest_start:
-            print(f"No events after {earliest_start.strftime('%H:%M')} tomorrow.")
-        elif latest_end:
-            print(f"No events before {latest_end.strftime('%H:%M')} tomorrow.")
-        else:
-            print("No events tomorrow.")
-
+        print("No events.")
         print(f"FREE  {day_start.strftime('%H:%M')} → {day_end.strftime('%H:%M')}")
         return
 
-    # --- MERGE BUSY BLOCKS ---
     busy.sort(key=lambda x: x[0])
 
     merged = []
@@ -99,15 +92,13 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
             merged[-1][1] = max(merged[-1][1], e)
             merged[-1][2].append(title)
 
-    # --- PRINT BUSY ---
-    print("Busy blocks tomorrow (work hours):")
+    print("Busy blocks:")
     for s, e, titles in merged:
         if s == day_start and e == day_end:
-            print(f"  BUSY  ALL DAY  (reason: {titles[0]})")
+            print(f"  BUSY ALL DAY (reason: {titles[0]})")
         else:
-            print(f"  BUSY  {s.strftime('%H:%M')} → {e.strftime('%H:%M')}  (e.g., {titles[0]})")
+            print(f"  BUSY {s.strftime('%H:%M')} → {e.strftime('%H:%M')}")
 
-    # --- COMPUTE FREE ---
     free_slots = []
     cursor = day_start
 
@@ -119,16 +110,10 @@ def show_free_slots_tomorrow(events, earliest_start=None, latest_end=None):
     if cursor < day_end:
         free_slots.append((cursor, day_end))
 
-    # --- OUTPUT ---
     if not free_slots:
-        if earliest_start:
-            print(f"\nNo available slots after {earliest_start.strftime('%H:%M')} tomorrow.")
-        elif latest_end:
-            print(f"\nNo available slots before {latest_end.strftime('%H:%M')} tomorrow.")
-        else:
-            print("\nNo available slots tomorrow.")
+        print("\nNo available slots.")
         return
 
-    print("\nFree slots tomorrow:")
+    print("\nFree slots:")
     for s, e in free_slots:
-        print(f"  FREE  {s.strftime('%H:%M')} → {e.strftime('%H:%M')}")
+        print(f"  FREE {s.strftime('%H:%M')} → {e.strftime('%H:%M')}")

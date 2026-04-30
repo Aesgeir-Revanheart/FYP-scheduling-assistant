@@ -6,7 +6,10 @@ def parse_query(text: str):
     out = {}
 
     # --- DATE ---
-    if "tomorrow" in text_l:
+    if "today" in text_l:
+        out["date"] = "today"
+        
+    elif "tomorrow" in text_l:
         out["date"] = "tomorrow"
 
     # --- TIME NORMALIZATION ---

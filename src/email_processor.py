@@ -15,12 +15,13 @@ def process_email(subject, events):
 
     print(f"[DEBUG] parsed = {parsed}")
 
-    # --- DEFAULT DATE (IMPORTANT) ---
+    # --- DATE ---
     now_local = datetime.now(MY_TZ)
-    target_date = now_local.date()
 
     if parsed.get("date") == "tomorrow":
         target_date = (now_local + timedelta(days=1)).date()
+    else:
+        target_date = now_local.date()
 
     # --- TIME WINDOWS ---
     after_hour = parsed.get("after_hour")
@@ -41,7 +42,7 @@ def process_email(subject, events):
             target_date, datetime.min.time(), tzinfo=MY_TZ
         ).replace(hour=before_hour, minute=before_min)
 
-    # --- SPECIFIC TIME CHECK (IF "at" is present) ---
+    # --- SPECIFIC TIME CHECK ---
     at_hour = parsed.get("at_hour")
     at_min = parsed.get("at_min", 0)
 
@@ -73,10 +74,10 @@ def process_email(subject, events):
         else:
             print(f"Result: BUSY at {specific_time.strftime('%H:%M')}")
 
-    # --- OTHERWISE: SHOW SLOTS (for before/after queries) ---
     else:
         show_free_slots_tomorrow(
             events,
             earliest_start=earliest_start,
             latest_end=latest_end,
+            target_date=target_date   # ✅ THIS is the key change
         )

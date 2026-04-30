@@ -225,13 +225,13 @@ def main():
 
     events = fetch_events(service, target_id)
 
-    USER_QUERY = "Are you free at 1pm tomorrow?"
+    USER_QUERY = "Are you free before 11pm today?"
 
     parsed = parse_query(USER_QUERY)
     print(f"[DEBUG] USER_QUERY = {USER_QUERY!r}")
     print(f"[DEBUG] parsed     = {parsed!r}")
 
-    if parsed and parsed.get("date") == "tomorrow":
+    if parsed:
         after_hour = parsed.get("after_hour")
         after_min = parsed.get("after_min", 0)
 
