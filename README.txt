@@ -66,6 +66,6 @@ You can modify the test input manually:
 - Busy slots displayed
 - Free slots listed
 - Specific time checks:
-  → "FREE at 13:00"
-  → "BUSY at 16:00"
+  "FREE at 13:00"
+  "BUSY at 16:00"
 
