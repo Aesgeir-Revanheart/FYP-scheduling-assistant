@@ -227,7 +227,7 @@ def main():
 
     events = fetch_events(service, target_id)
 
-    USER_QUERY = "Are you free at 9pm tomorrow?"
+    USER_QUERY = "Are you free tomorrow?"
 
     parsed = parse_query(USER_QUERY)
     print(f"[DEBUG] USER_QUERY = {USER_QUERY!r}")
