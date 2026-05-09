@@ -38,13 +38,12 @@ Python is required to run this project.
 If Python is not already installed on your system, you can download the latest version here:
 
 https://www.python.org/downloads/
----
+
 
 ## Step 2
 
 Clone the repository using Git or download the ZIP file from GitHub.
 
----
 
 ## Step 3
 
@@ -164,17 +163,7 @@ https://console.cloud.google.com/
 
 ---
 
-## Step 5 — Install Required Libraries
-
-Install the required Python libraries using:
-
-```bash
-pip install google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2
-```
-
----
-
-## Step 6 — Run the Project
+## Step 5 — Run the Project
 
 You may first try running the project using:
 
@@ -190,7 +179,7 @@ python src/main.py
 
 ---
 
-## Step 7 — First-Time Authentication
+## Step 6 — First-Time Authentication
 
 When running the application for the first time:
 
