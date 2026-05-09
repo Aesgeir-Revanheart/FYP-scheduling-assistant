@@ -82,12 +82,12 @@ https://console.cloud.google.com/
 3. At the top of the page, click the project selection dropdown.
 
 4. Click:
-   `New Project`
+   New Project
 
 5. Enter a project name.
 
 6. Click:
-   `Create`
+   Create
 
 ---
 
@@ -95,21 +95,21 @@ https://console.cloud.google.com/
 
 1. Inside the Google Cloud project, use the left sidebar and go to:
 
-`APIs & Services` → `Library`
+    APIs & Services -> Library
 
 2. Search for:
-   `Gmail API`
+    Gmail API
 
 3. Open it and click:
-   `Enable`
+    Enable
 
 4. Return to the API Library.
 
 5. Search for:
-   `Google Calendar API`
+    Google Calendar API
 
 6. Open it and click:
-   `Enable`
+    Enable
 
 ---
 
@@ -117,13 +117,13 @@ https://console.cloud.google.com/
 
 1. In the left sidebar, go to:
 
-`APIs & Services` → `OAuth consent screen`
+    APIs & Services → OAuth consent screen
 
 2. Choose:
-   `External`
+    External
 
 3. Click:
-   `Create`
+    Create
 
 4. Fill in the required fields such as:
    - App name
@@ -140,26 +140,26 @@ https://console.cloud.google.com/
 
 1. In the left sidebar, go to:
 
-`APIs & Services` → `Credentials`
+    APIs & Services → Credentials
 
 2. Click:
-   `Create Credentials`
+    Create Credentials
 
 3. Select:
-   `OAuth client ID`
+    OAuth client ID
 
 4. For Application Type, select:
-   `Desktop App`
+    Desktop App
 
 5. Enter a name for the OAuth client.
 
 6. Click:
-   `Create`
+    Create
 
 7. Download the generated OAuth JSON file.
 
 8. Rename the downloaded file to:
-   `client_secret.json`
+    client_secret.json
 
 9. Place the file inside the project root directory.
 
