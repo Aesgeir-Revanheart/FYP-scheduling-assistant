@@ -1,6 +1,6 @@
-#AI Scheduling Assistant (FYP)
+## AI Scheduling Assistant (FYP)
 
-#Overview
+## Overview
 This project is a semi-automated scheduling assistant that processes email queries and checks calendar availability using Google Calendar.
 
 The system interprets queries such as:
@@ -12,7 +12,7 @@ It then outputs available time slots based on the user’s calendar.
 
 
 
-# How to Run
+## How to Run
 
 1. Open the project in an IDE (VSC)
 2. Navigate to:
@@ -61,7 +61,7 @@ You can modify the test input manually:
 - Run the script again
 
 
-#Output Example
+## Output Example
 
 - Busy slots displayed
 - Free slots listed
